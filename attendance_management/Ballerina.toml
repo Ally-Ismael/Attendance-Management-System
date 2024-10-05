@@ -1,0 +1,11 @@
+[package]
+org = "asher"
+name = "attendance_management"
+version = "0.1.0"
+distribution = "2201.7.1"
+
+[build-options]
+observabilityIncluded = true
+
+[[platform.java11.dependency]]
+path = "C:/Users/Asher/Downloads/mysql-connector-j-9.0.0/mysql-connector-j-9.0.0/mysql-connector-j-9.0.0.jar"
