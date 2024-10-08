@@ -74,15 +74,6 @@ type Report record {
     string file_path;
 };
 
-// Define a service for students
-@http:ServiceConfig {
-    cors: {
-        allowOrigins: ["*"],
-        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        allowHeaders: ["Content-Type", "Accept", "Accept-Language", "Accept-Encoding"]
-    }
-}
-
 // RESTful service for student management
 service /students on httpListener {
 
@@ -98,14 +89,9 @@ service /students on httpListener {
         sql:ParameterizedQuery query = `INSERT INTO Student (name, email, phone) VALUES (${student.name}, ${student.email}, ${student.phone})`;
 
         // Execute the query
-        sql:ExecutionResult|sql:Error e = dbClient->execute(query);
-        if (e is error) {
-            // Handle the error
-            io:println("Error creating student: ", e);
-            check caller->respond(http:INTERNAL_SERVER_ERROR);
-        } else {
-            check caller->respond("Student created successfully.");
-        }
+        _ = check dbClient->execute(query);
+
+        check caller->respond("Student created successfully.");
     }
 
     // Retrieve a student by name (R)
@@ -144,14 +130,9 @@ service /students on httpListener {
         sql:ParameterizedQuery query = `UPDATE Student SET name = ${updatedStudent.name}, email = ${updatedStudent.email}, phone = ${updatedStudent.phone} WHERE name = ${name}`;
 
         // Execute the query
-        sql:ExecutionResult|sql:Error e = dbClient->execute(query);
-        if (e is error) {
-            // Handle the error
-            io:println("Error updating student: ", e);
-            check caller->respond(http:INTERNAL_SERVER_ERROR);
-        } else {
-            check caller->respond("Student updated successfully.");
-        }
+        _ = check dbClient->execute(query);
+
+        check caller->respond("Student updated successfully.");
     }
 
     // Delete a student by name (D)
@@ -159,17 +140,13 @@ service /students on httpListener {
         // Define a SQL query to delete the student by name
         sql:ParameterizedQuery query = `DELETE FROM Student WHERE name = ${name}`;
 
-        // Execute the query 
-        sql:ExecutionResult|sql:Error e = dbClient->execute(query);
-        if (e is error) {
-            // Handle the error
-            io:println("Error deleting student: ", e);
-            check caller->respond(http:INTERNAL_SERVER_ERROR);
-        } else {
-            check caller->respond("Student deleted successfully.");
-        }
+        // Execute the query
+        _ = check dbClient->execute(query);
+
+        check caller->respond("Student deleted successfully.");
     }
 
+    
     // Retrieve all students (R)
     resource function get getAllStudents(http:Caller caller, http:Request req) returns error? {
         // Define a SQL query to retrieve all students
@@ -189,17 +166,6 @@ service /students on httpListener {
 
         // Respond with the list of students
         check caller->respond(students);
-    }
-}
-
-
-
-// Define a service for teachers
-@http:ServiceConfig {
-    cors: {
-        allowOrigins: ["*"],
-        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        allowHeaders: ["Content-Type", "Accept", "Accept-Language", "Accept-Encoding"]
     }
 }
 
@@ -249,16 +215,7 @@ service /teachers on httpListener {
     }
 }
 
-// Define a service for classes
-@http:ServiceConfig {
-    cors: {
-        allowOrigins: ["*"],
-        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        allowHeaders: ["Content-Type", "Accept", "Accept-Language", "Accept-Encoding"]
-    }
-}
-
-//RESTful service for class management
+// RESTful service for class management
 service /classes on httpListener {
 
 // Create a new class (C)
@@ -367,16 +324,6 @@ resource function post createClass(http:Caller caller, http:Request req) returns
     }
 }
 
-
-// Define a service for attendance
-@http:ServiceConfig {
-    cors: {
-        allowOrigins: ["*"],
-        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        allowHeaders: ["Content-Type", "Accept", "Accept-Language", "Accept-Encoding"]
-    }
-}
-
 // RESTful service for attendance management
 service /attendance on httpListener {
 
@@ -457,15 +404,6 @@ service /attendance on httpListener {
     }
 }
 
-// Define a service for notifications
-@http:ServiceConfig {
-    cors: {
-        allowOrigins: ["*"],
-        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        allowHeaders: ["Content-Type", "Accept", "Accept-Language", "Accept-Encoding"]
-    }
-}
-
 // RESTful service for notification management
 service /notifications on httpListener {
     // Create a new notification (C)
@@ -541,18 +479,8 @@ service /notifications on httpListener {
     }
 }
 
-
-// Define a service for reports
-@http:ServiceConfig {
-    cors: {
-        allowOrigins: ["*"],
-        allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        allowHeaders: ["Content-Type", "Accept", "Accept-Language", "Accept-Encoding"]
-    }
-}
-
 // RESTful service for report management
-service /reports on httpListener {
+service /reports on httpListener{
     // Create a new report (C)
     resource function post createReport(http:Caller caller, http:Request req) returns error? {
         json requestBody = check req.getJsonPayload();
